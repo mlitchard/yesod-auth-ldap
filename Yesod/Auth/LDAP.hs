@@ -13,7 +13,8 @@
 -- 
 
 module Yesod.Auth.LDAP
-   ( genericAuthLDAP ) where
+   ( genericAuthLDAP
+   , LDAPConfig (..)) where
 
 #include "qq.h"
 
