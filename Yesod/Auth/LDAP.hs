@@ -18,14 +18,15 @@ module Yesod.Auth.LDAP
 
 #include "qq.h"
 
+import Yesod.Core (lift) 
 import Yesod.Auth
 import Yesod.Auth.Message
 import Web.Authenticate.LDAP
 import LDAP
 import Data.Text (Text,pack,unpack)
 import Text.Hamlet
-import Yesod.Handler
-import Yesod.Widget
+import Yesod.Core.Handler
+import Yesod.Core.Widget
 import Control.Monad.IO.Class (liftIO)
 import Yesod.Form
 import Control.Applicative ((<$>), (<*>))
@@ -47,7 +48,7 @@ data LDAPConfig = LDAPConfig {
 
 
 genericAuthLDAP :: YesodAuth m => LDAPConfig -> AuthPlugin m
-genericAuthLDAP config = AuthPlugin "LDAP" dispatch $ \tm -> addHamlet
+genericAuthLDAP config = AuthPlugin "LDAP" dispatch $ \tm -> toWidget 
     [QQ(hamlet)|
     <div id="header">
          <h1>Login
@@ -77,27 +78,27 @@ genericAuthLDAP config = AuthPlugin "LDAP" dispatch $ \tm -> addHamlet
     dispatch "POST" ["login"] = postLoginR config >>= sendResponse
     dispatch _ _              = notFound
 
+
 login :: AuthRoute
 login = PluginR "LDAP" ["login"]
 
 
-postLoginR :: (YesodAuth y) => LDAPConfig -> GHandler Auth y ()
+postLoginR :: (YesodAuth y) => LDAPConfig -> HandlerT Auth (HandlerT y IO) ()
 postLoginR config = do
-    (mu,mp) <- runInputPost $ (,)
+    (mu,mp) <- lift $ runInputPost $ (,)
         <$> iopt textField "username"
         <*> iopt textField "password"
 
     let errorMessage (message :: Text) = do
-        setMessage [QQ(shamlet)|Error: #{message}|]
-        toMaster <- getRouteToMaster
-        redirect $ toMaster LoginR
+        lift $ setMessage [QQ(shamlet)|Error: #{message}|]
+        redirect LoginR
 
     case (mu,mp) of
         (Nothing, _      ) -> do
-            mr <- getMessageRender
+            mr <- lift getMessageRender
             errorMessage $ mr PleaseProvideUsername
         (_      , Nothing) -> do
-            mr <- getMessageRender
+            mr <- lift getMessageRender
             errorMessage $ mr PleaseProvidePassword
         (Just u , Just p ) -> do
           result <- liftIO $ loginLDAP (usernameModifier config u)
@@ -118,6 +119,6 @@ postLoginR config = do
                        , credsPlugin = "LDAP"
                        , credsExtra  = []
                        }
-                 setCreds True creds
+                 lift $ setCreds True creds
             ldapError -> errorMessage (pack $ show ldapError)
 
