@@ -1,5 +1,5 @@
 name:            yesod-auth-ldap
-version:         0.0.2
+version:         0.0.3
 license:         BSD3
 license-file:    LICENSE
 author:          Michael Litchard 
@@ -20,16 +20,17 @@ library
         build-depends:   base                >= 4.3      && < 5
         cpp-options:     -DGHC7
     else
-        build-depends:   base                >= 4        && < 4.3
-    build-depends:   LDAP                    == 0.6.6    
-                   , bytestring              >= 0.9.1.4   && < 0.10
-                   , yesod-core              >= 0.10      && < 0.11
-                   , yesod-auth              >= 0.8       && < 0.9
-                   , text                    >= 0.7       && < 0.12
-                   , hamlet                  >= 0.10      && < 0.11
-                   , yesod-form              >= 0.4       && < 0.5
-                   , transformers            >= 0.2.2     && < 0.3
-                   , authenticate-ldap       == 0.0.2
+        build-depends:   base                >= 4        
+    build-depends:   LDAP                    >= 0.6.6    
+                   , bytestring              >= 0.9.1.4  
+                   , text                    >= 0.7     
+                   , hamlet                  >= 0.10      
+                   , yesod-platform          >= 1.2.2       
+                   , yesod-form
+                   , yesod-core 
+                   , yesod-auth
+                   , transformers            > 0.2.2     
+                   , authenticate-ldap       >= 0.0.4 
 
     exposed-modules: Yesod.Auth.LDAP
     ghc-options:     -Wall
