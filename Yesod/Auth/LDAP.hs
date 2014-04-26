@@ -30,6 +30,7 @@ import Yesod.Core.Widget
 import Control.Monad.IO.Class (liftIO)
 import Yesod.Form
 import Control.Applicative ((<$>), (<*>))
+import Control.Arrow ((***))
 
 data LDAPConfig = LDAPConfig {
    -- | Given user x, f(x) will be search as a LDAP filter, eg: uid=username
@@ -112,8 +113,18 @@ postLoginR config = do
                  let creds = Creds
                        { credsIdent  = identifierModifier config u entry
                        , credsPlugin = "LDAP"
-                       , credsExtra  = []
+                       , credsExtra  = map (pack *** pack) $
+                           ldapAttrsFlatten $ leattrs entry
                        }
                  lift $ setCreds True creds
             ldapError -> errorMessage (pack $ show ldapError)
 
+{-
+We need to flatten the right part because credsExtra is of type [(String,
+String)], and we don't want to loose information by converting to Text, we
+can have multiple values for the left key. One must be careful when using
+the `lookup` function.
+-}
+ldapAttrsFlatten :: [(a, [b])] -> [(a, b)]
+ldapAttrsFlatten = concat . map split
+    where split (l, x) = map ((,) l) x
