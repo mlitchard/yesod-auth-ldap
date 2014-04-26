@@ -32,10 +32,8 @@ import Yesod.Form
 import Control.Applicative ((<$>), (<*>))
 
 data LDAPConfig = LDAPConfig {
-   -- | When a user gives username x, f(x) will be passed to LDAP
-   usernameModifier :: Text -> Text 
-   -- | During the second bind, the username must be converted to a valid DN
- ,  nameToDN :: Text -> String 
+   -- | Given user x, f(x) will be search as a LDAP filter, eg: uid=username
+   usernameFilter :: Text -> Text
    -- | When a user gives username x, f(x) will be passed to Yesod
  , identifierModifier :: Text -> [LDAPEntry] -> Text
  , ldapUri :: String
@@ -100,8 +98,7 @@ postLoginR config = do
             mr <- lift getMessageRender
             errorMessage $ mr PleaseProvidePassword
         (Just u , Just p ) -> do
-          result <- liftIO $ loginLDAP (usernameModifier config u)
-                                       (nameToDN config u)
+          result <- liftIO $ loginLDAP (usernameFilter config u)
                                        (unpack p)
                                        (ldapUri config)
                                        (initDN config)
