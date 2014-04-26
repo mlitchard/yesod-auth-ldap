@@ -38,8 +38,7 @@ data LDAPConfig = LDAPConfig {
  ,  nameToDN :: Text -> String 
    -- | When a user gives username x, f(x) will be passed to Yesod
  , identifierModifier :: Text -> [LDAPEntry] -> Text
- , ldapHost :: String
- , ldapPort' :: LDAPInt
+ , ldapUri :: String
  , initDN :: String -- DN for initial binding, must have authority to search
  , initPass :: String -- Password for initDN
  , baseDN :: Maybe String -- Base DN for user search, if any
@@ -104,8 +103,7 @@ postLoginR config = do
           result <- liftIO $ loginLDAP (usernameModifier config u)
                                        (nameToDN config u)
                                        (unpack p)
-                                       (ldapHost config)
-                                       (ldapPort' config)
+                                       (ldapUri config)
                                        (initDN config)
                                        (initPass config)
                                        (baseDN config)
