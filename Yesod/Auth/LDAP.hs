@@ -35,7 +35,7 @@ data LDAPConfig = LDAPConfig {
    -- | Given user x, f(x) will be search as a LDAP filter, eg: uid=username
    usernameFilter :: Text -> Text
    -- | When a user gives username x, f(x) will be passed to Yesod
- , identifierModifier :: Text -> [LDAPEntry] -> Text
+ , identifierModifier :: Text -> LDAPEntry -> Text
  , ldapUri :: String
  , initDN :: String -- DN for initial binding, must have authority to search
  , initPass :: String -- Password for initDN
@@ -108,9 +108,9 @@ postLoginR config = do
                                        
                                        
           case result of
-            Ok ldapEntries -> do
+            Ok entry -> do
                  let creds = Creds
-                       { credsIdent  = identifierModifier config u ldapEntries 
+                       { credsIdent  = identifierModifier config u entry
                        , credsPlugin = "LDAP"
                        , credsExtra  = []
                        }
