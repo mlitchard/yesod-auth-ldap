@@ -24,6 +24,7 @@ library
     build-depends:   LDAP                    >= 0.6.6    
                    , bytestring              >= 0.9.1.4  
                    , text                    >= 0.7     
+                   , shakespeare             >= 2.0.0
                    , hamlet                  >= 0.10      
                    , yesod-platform          >= 1.2.2       
                    , yesod-form
