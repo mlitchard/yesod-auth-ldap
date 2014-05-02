@@ -55,7 +55,7 @@ genericAuthLDAP config = AuthPlugin "LDAP" dispatch $ \tm -> toWidget
                         <input type="password" name="password" required>
                 <tr>
                     <td colspan="2">
-                        <button type=submit>Login
+                        <button type=submit .btn .btn-success>Login
 |]
   where
     dispatch "POST" ["login_ldap"] = postLoginR config >>= sendResponse
