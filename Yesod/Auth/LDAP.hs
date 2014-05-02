@@ -31,6 +31,7 @@ import Control.Monad.IO.Class (liftIO)
 import Yesod.Form
 import Control.Applicative ((<$>), (<*>))
 import Control.Arrow ((***))
+import qualified Yesod.Auth.Message as Msg
 
 data LDAPConfig = LDAPConfig {
    -- | Given user x, f(x) will be search as a LDAP filter, eg: uid=username
@@ -46,31 +47,21 @@ data LDAPConfig = LDAPConfig {
 
 
 genericAuthLDAP :: YesodAuth m => LDAPConfig -> AuthPlugin m
-genericAuthLDAP config = AuthPlugin "LDAP" dispatch $ \tm -> toWidget 
-    [QQ(hamlet)|
-    <div id="header">
-         <h1>Login
-
-    <div id="login">
+genericAuthLDAP config = AuthPlugin "LDAP" dispatch $ \tm -> toWidget
+    [whamlet|
         <form method="post" action="@{tm login}">
             <table>
                 <tr>
-                    <th>Username:
+                    <th>LDAP
                     <td>
-                        <input id="x" name="username" autofocus="" required>
+                        <input type="text" name="username" required>
                 <tr>
-                    <th>Password:
+                    <th>_{Msg.Password}
                     <td>
                         <input type="password" name="password" required>
                 <tr>
-                    <td>&nbsp;
-                    <td>
-                        <input type="submit" value="Login">
-
-            <script>
-                if (!("autofocus" in document.createElement("input"))) {
-                    document.getElementById("x").focus();
-                }
+                    <td colspan="2">
+                        <button type=submit>Login
 |]
   where
     dispatch "POST" ["login_ldap"] = postLoginR config >>= sendResponse
