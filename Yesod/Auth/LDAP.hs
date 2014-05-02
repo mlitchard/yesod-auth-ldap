@@ -73,12 +73,12 @@ genericAuthLDAP config = AuthPlugin "LDAP" dispatch $ \tm -> toWidget
                 }
 |]
   where
-    dispatch "POST" ["login"] = postLoginR config >>= sendResponse
+    dispatch "POST" ["login_ldap"] = postLoginR config >>= sendResponse
     dispatch _ _              = notFound
 
 
 login :: AuthRoute
-login = PluginR "LDAP" ["login"]
+login = PluginR "LDAP" ["login_ldap"]
 
 
 postLoginR :: (YesodAuth y) => LDAPConfig -> HandlerT Auth (HandlerT y IO) ()
