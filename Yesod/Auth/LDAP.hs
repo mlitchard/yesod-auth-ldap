@@ -8,17 +8,11 @@
 -- trying to use this module.
 
 
--- sample manual LDAP code here
-
--- 
-
 module Yesod.Auth.LDAP
    ( genericAuthLDAP
    , LDAPConfig (..)) where
 
-#include "qq.h"
-
-import Yesod.Core (lift) 
+import Yesod.Core (lift)
 import Yesod.Auth
 import Yesod.Auth.Message
 import Web.Authenticate.LDAP
@@ -43,7 +37,7 @@ data LDAPConfig = LDAPConfig {
  , initPass :: String -- Password for initDN
  , baseDN :: Maybe String -- Base DN for user search, if any
  , ldapScope :: LDAPScope
- }  
+ }
 
 
 genericAuthLDAP :: YesodAuth m => LDAPConfig -> AuthPlugin m
@@ -65,7 +59,7 @@ genericAuthLDAP config = AuthPlugin "LDAP" dispatch $ \tm -> toWidget
 |]
   where
     dispatch "POST" ["login_ldap"] = postLoginR config >>= sendResponse
-    dispatch _ _              = notFound
+    dispatch _ _ = notFound
 
 
 login :: AuthRoute
@@ -79,7 +73,7 @@ postLoginR config = do
         <*> iopt textField "password"
 
     let errorMessage (message :: Text) = do
-        lift $ setMessage [QQ(shamlet)|Error: #{message}|]
+        lift $ setMessage [shamlet|Error: #{message}|]
         redirect LoginR
 
     case (mu,mp) of
@@ -97,8 +91,8 @@ postLoginR config = do
                                        (initPass config)
                                        (baseDN config)
                                        (ldapScope config)
-                                       
-                                       
+
+
           case result of
             Ok entry -> do
                  let creds = Creds
