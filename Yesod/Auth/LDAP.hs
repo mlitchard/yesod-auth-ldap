@@ -2,6 +2,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 -- Plugin LDAP authentication for Yesod, based heavily on Yesod.Auth.Kerberos.
 -- Verify that your LDAP installation can bind and return LDAP objects before
